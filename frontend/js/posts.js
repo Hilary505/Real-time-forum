@@ -33,22 +33,7 @@ function displayCategories(categories) {
     fetchPosts();
   };
   categoriesList.appendChild(allCategoriesElement);
-
-  const reactedPostsElement = document.createElement("div");
-  reactedPostsElement.className = "category-card";
-  reactedPostsElement.innerHTML = `<h3>Reacted Posts</h3>`;
-  reactedPostsElement.onclick = () => {
-    document.querySelectorAll(".category-card").forEach((card) =>
-      card.classList.remove("active")
-    );
-    reactedPostsElement.classList.add("active");
-    currentCategory = "ReactedPosts";
-    fetchPosts();
-  };
-  categoriesList.appendChild(reactedPostsElement);
-
-
-
+  
   categories.forEach((category) => {
     const categoryElement = document.createElement("div");
     categoryElement.className = "category-card";
