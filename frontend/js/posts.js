@@ -34,6 +34,17 @@ function displayCategories(categories) {
   };
   categoriesList.appendChild(allCategoriesElement);
   
+  const reactedPostsElement = document.createElement("div");
+  reactedPostsElement.onclick = () => {
+    document.querySelectorAll(".category-card").forEach((card) =>
+      card.classList.remove("active")
+    );
+    reactedPostsElement.classList.add("active");
+    currentCategory = "ReactedPosts";
+    fetchPosts();
+  };
+  categoriesList.appendChild(reactedPostsElement);
+
   categories.forEach((category) => {
     const categoryElement = document.createElement("div");
     categoryElement.className = "category-card";
