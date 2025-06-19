@@ -8,14 +8,14 @@ import (
 )
 
 type Message struct {
-	ID           string    `json:"id"`
-	Content      string    `json:"content"`
-	SenderID     string    `json:"sender_id"`
-	ReceiverID   string    `json:"receiver_id"`
-	CreatedAt    time.Time `json:"created_at"`
-	Type         string    `json:"type"` // message, typing, stop_typing
-	Online       bool      `json:"online"`
-	Nickname     string    `json:"nickname"`
+	ID         string    `json:"id"`
+	Content    string    `json:"content"`
+	SenderID   string    `json:"sender_id"`
+	ReceiverID string    `json:"receiver_id"`
+	CreatedAt  time.Time `json:"created_at"`
+	Type       string    `json:"type"` // message, typing, stop_typing
+	Online     bool      `json:"online"`
+	Nickname   string    `json:"nickname"`
 }
 
 type Reaction struct {
@@ -27,17 +27,18 @@ type Reaction struct {
 }
 
 type User struct {
-	ID        int       `json:"id"`
-	UUID      string    `json:"user_uuid"`
-	Nickname  string    `json:"nickname"`
-	Age       int       `json:"age"`
-	Gender    string    `json:"gender"`
-	FirstName string    `json:"firstName"`
-	LastName  string    `json:"lastName"`
-	Email     string    `json:"email"`
-	Password  string    `json:"Password"`
-	CreatedAt time.Time `json:"createdAt"`
-	IsOnline  bool      `json:"isOnline"`
+	ID                   int       `json:"id"`
+	UUID                 string    `json:"user_uuid"`
+	Nickname             string    `json:"nickname"`
+	Age                  int       `json:"age"`
+	Gender               string    `json:"gender"`
+	FirstName            string    `json:"firstName"`
+	LastName             string    `json:"lastName"`
+	Email                string    `json:"email"`
+	Password             string    `json:"Password"`
+	CreatedAt            time.Time `json:"createdAt"`
+	IsOnline             bool      `json:"isOnline"`
+	LastPrivateMessageAt time.Time `json:"last_private_message_at"`
 }
 
 type Category struct {

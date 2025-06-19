@@ -23,8 +23,6 @@ func Routers() (*http.ServeMux, error) {
 	mux.HandleFunc("/login", handlers.HandleLogin)
 	mux.HandleFunc("/logout", handlers.LogoutUser)
 	
-	// Posts and categories can be viewed without authentication
-	
 	// These endpoints require authentication
 	mux.HandleFunc("/", handlers.HandleHomepage)
 	mux.HandleFunc("/users", handlers.AuthMiddleware(http.HandlerFunc(handlers.HandleUsers)))

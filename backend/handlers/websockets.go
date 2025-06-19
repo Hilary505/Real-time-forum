@@ -68,7 +68,7 @@ func HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 	mu.Lock()
 	Clients[client.UserID] = client
 	mu.Unlock()
-	// log.Printf("WebSocket: User %s (%s) connected.", user.UUID, user.Nickname) 
+	// log.Printf("WebSocket: User %s (%s) connected.", user.UUID, user.Nickname)
 
 	// Broadcast Online Status of the new user to everyone
 	statusMsg := models.Message{
@@ -135,6 +135,22 @@ func readMessages(c *Client) {
 			if err != nil {
 				log.Printf("Failed to save message: %v", err)
 				continue
+			}
+
+			now := time.Now()
+			_, err = database.Db.Exec(
+				"UPDATE users SET last_message_time = ? WHERE uuid = ?",
+				now, msg.SenderID,
+			)
+			if err != nil {
+				log.Printf("WebSocket: Failed to update last_private_message_at for sender %s: %v", msg.SenderID, err)
+			}
+			_, err = database.Db.Exec(
+				"UPDATE users SET last_message_time = ? WHERE uuid = ?",
+				now, msg.ReceiverID,
+			)
+			if err != nil {
+				log.Printf("WebSocket: Failed to update last_private_message_at for receiver %s: %v", msg.ReceiverID, err)
 			}
 
 			broadcast <- msg

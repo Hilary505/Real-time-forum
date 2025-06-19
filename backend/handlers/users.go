@@ -1,8 +1,11 @@
 package handlers
 
 import (
+	"database/sql"
 	"encoding/json"
+	"log"
 	"net/http"
+	"time"
 
 	"real-time-forum/backend/database"
 	"real-time-forum/backend/models"
@@ -26,14 +29,19 @@ func HandleUsers(w http.ResponseWriter, r *http.Request) {
 	}
 	// Get all users
 	rows, err := database.Db.Query(`
-	SELECT id,uuid, gender, age, nickname, email, first_name, last_name
+	SELECT id,uuid, gender, age, nickname, email, first_name, last_name, last_message_time
 	FROM users
-	ORDER BY nickname ASC
+	ORDER BY
+	CASE WHEN last_message_time IS NULL THEN 1 ELSE 0 END,
+            last_message_time DESC,
+	nickname ASC
 	`)
+
 	if err != nil {
 		http.Error(w, "Error fetching users", http.StatusInternalServerError)
 		return
 	}
+
 	defer rows.Close()
 
 	// Parse the users
@@ -41,17 +49,31 @@ func HandleUsers(w http.ResponseWriter, r *http.Request) {
 
 	for rows.Next() {
 		var u models.User
-		err := rows.Scan(&u.ID, &u.UUID, &u.Gender, &u.Age, &u.Nickname, &u.Email, &u.FirstName, &u.LastName)
+		var lastMsgAtStr sql.NullString
+		err := rows.Scan(&u.ID, &u.UUID, &u.Gender, &u.Age, &u.Nickname, &u.Email, &u.FirstName, &u.LastName, &lastMsgAtStr)
 		if err != nil {
 			http.Error(w, "Error parsing users", http.StatusInternalServerError)
 			return
 		}
+
+		if lastMsgAtStr.Valid {
+			parsedTime, err := time.Parse(time.RFC3339, lastMsgAtStr.String) // Adjust format if needed
+			if err == nil {
+				u.LastPrivateMessageAt = parsedTime // Assign to new field in models.User
+			} else {
+				log.Printf("Error parsing last_private_message_at for user %s: %v", u.Nickname, err)
+			}
+		}
+
 		if u.ID != user.ID {
 			users = append(users, u)
 		}
 	}
+
 	for i := range users {
+		mu.Lock()
 		_, ok := Clients[users[i].UUID]
+		mu.Unlock()
 		if ok {
 			users[i].IsOnline = true
 		} else {
