@@ -18,7 +18,8 @@ func CreateUsersTable(db *sql.DB) error {
     email TEXT UNIQUE NOT NULL,
     first_name TEXT UNIQUE NOT NULL,
     last_name TEXT NOT NULL,
-    password TEXT NOT NULL
+    password TEXT NOT NULL,
+    last_message_time DATETIME
     );`
 	if _, err := db.Exec(query); err != nil {
 		return err
