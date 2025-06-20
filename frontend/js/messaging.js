@@ -423,9 +423,26 @@ document.addEventListener("DOMContentLoaded", () => {
           hasMoreMessages = true
           console.log("Initial load: More messages available")
         }
+        let lastMessageDate = null
 
         messages.reverse().forEach((message) => {
-          const messageElement = createMessageElement(message)
+        const messageDate = new Date(message.created_at)
+        const dateString = messageDate.toDateString()
+
+       if (lastMessageDate !== dateString) {
+       const dateSeparator = document.createElement("div")
+       dateSeparator.className = "date-separator"
+       dateSeparator.textContent = dateString
+       dateSeparator.style.cssText = `
+        text-align: center;
+        font-size: 0.8rem;
+        margin: 10px 0;
+        color: #888;
+      `
+      messagesContainer.appendChild(dateSeparator)
+      lastMessageDate = dateString
+     }
+       const messageElement = createMessageElement(message)
           messagesContainer.appendChild(messageElement)
         })
 
@@ -480,10 +497,8 @@ document.addEventListener("DOMContentLoaded", () => {
     // Create timestamp element
     const messageTime = document.createElement("div")
     messageTime.className = "message-time"
-    messageTime.textContent = new Date(message.created_at).toLocaleTimeString([], {
-      hour: "2-digit",
-      minute: "2-digit",
-    })
+    messageTime.textContent = getRelativeOrAbsoluteTime(message.created_at)
+
     messageTime.style.cssText = `
       font-size: 0.65rem;
       opacity: 0.7;
@@ -510,6 +525,23 @@ document.addEventListener("DOMContentLoaded", () => {
     return messageElement
   }
 
+  function getRelativeOrAbsoluteTime(timestamp) {
+    const now = new Date()
+    const messageTime = new Date(timestamp)
+    const diffMs = now - messageTime
+    const diffMins = Math.floor(diffMs / 60000)
+  
+    // Relative time formatting
+    if (diffMins < 1) return "now"
+    if (diffMins < 60) return `${diffMins} min${diffMins !== 1 ? "s" : ""}`
+  
+    // Switch to absolute time after 60 mins 
+    return messageTime.toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+    })
+  }
+  
   function displayMessage(message) {
     if (
       message.sender_id === currentReceiver ||
